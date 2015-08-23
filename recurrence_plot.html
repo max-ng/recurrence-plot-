@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+ <head>
+	<title>recurrence plot </title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- Bootstrap -->
+	
+	<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+	
+		<!-- D3.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+  <!-- jQuery -->  
+ 
+  <!-- Plotly.js -->   
+  <script src="https://d14fo0winaifog.cloudfront.net/plotly-basic.js"></script>
+  <script type="text/javascript" src="js/jquery.js"></script>
+	
+
+  </head>
+
+
+<body>
+	
+    <style type="text/css">
+    #mycanvas {
+        float: left;
+        width: 40%;
+    }
+
+   #myDiv1 {
+        float: right;
+        width: 60%;
+        
+    
+    }
+</style>
+
+    <h1>RECURRENCE PLOT</h1>
+    <canvas id = "mycanvas" width = "400" height = "400" style = "border: 2px solid #000000;">
+		</canvas>
+		<div id="myDiv1"  width = "400" height = "400"></div>	
+	 </div>
+
+<script>
+var canvas = document.getElementById("mycanvas");
+var ctx = canvas.getContext("2d");
+
+var data = new Array(3);
+data[0] = new Array(100);
+data[1] = new Array(100);
+data[2] = new Array(10000);
+
+for (var i = 0; i < 100 ; i++){
+	
+	data[0][i] = i / 4 ;
+	data[1][i] = Math.sin(i / 4 );
+
+}
+
+var trace = {
+  x: data[0], 
+  y: data[1], 
+  mode: "lines", 
+  
+  
+  type: "scatter",
+
+ 
+  };
+var data1 = [trace];
+Plotly.plot("myDiv1", data1);
+
+
+for (var i = 0; i < 100 ; i++){
+  for (var j = 0; j < 100 ; j++){
+  if( Math.abs(data[1][i] - data[1][j]) < 0.1 ){
+    data[2][100*i + j] = 1 ; 
+  }else
+    data[2][100*i + j] = 0 ;
+
+  }
+}
+
+function draw(data){
+         ctx.clearRect(0, 0, canvas.width, canvas.height);
+         
+          for (var y = 0; y < 100; y++) {
+            for (var x = 0; x < 100; x++) {
+              var block = ctx.getImageData(x * 4, y * 4, 4, 4);
+              var newVal =   data[100*y+100 - x]* 255;
+              for (var i = 0; i < 4 * 4 * 4; i+=4) {
+                block.data[i] =   (1- data[100*y+100 - x])* 255;
+                block.data[i+1] = (1- data[100*y+100 - x])* 255;
+                block.data[i+2] = data[100*y+100 - x]* 255;
+                block.data[i+3] = 255;
+              }
+              ctx.putImageData(block, x * 4, y * 4);
+
+            }
+          }
+}
+draw(data[2]);
+
+</script>
+</body>
+</html>
